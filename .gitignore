@@ -1,0 +1,8 @@
+# Ignore extensionless files (https://stackoverflow.com/a/19023985/3821202)
+*
+!/**/
+!*.*
+
+# Ignore other compiled files
+*.exe
+*.o
