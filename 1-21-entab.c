@@ -17,7 +17,7 @@
 #define TAB_WIDTH 8
 
 int main() {
-	int c, i;
+	int c;
 	int col = 0;
 	int pending_spaces = 0;
 
