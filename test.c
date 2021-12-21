@@ -24,3 +24,34 @@
  * < god yzal eht revo
  * < spmuj xof nworb kciuq eht
  */
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int get_line(char **line) {
+    size_t i = 0;
+    size_t buf_size = 4;
+    char *buffer = malloc(buf_size);
+    int c = getchar();
+    while (1) {
+        if (i >= buf_size) {
+            buf_size *= 2;
+            buffer = realloc(buffer, buf_size);
+        }
+        if (c == EOF) break;
+        buffer[i++] = c;
+        if (c == '\n') break;
+    }
+    buffer[i] = '\0';
+    *line = buffer;
+    return i;
+}
+
+int main() {
+    int line_len;
+    char *line;
+    while(1) {
+        line_len = get_line(&line);
+        printf("Received a line of length %d:\n%s", line_len, line);
+    }
+}
