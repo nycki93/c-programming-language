@@ -1,0 +1,21 @@
+- It should replace 8-space tabs with 8 spaces.
+$ detab
+> mock_indent_zero
+> 	mock_indent_one
+> 		mock_indent_two
+> 			mock_indent_three
+< mock_indent_zero
+<         mock_indent_one
+<                 mock_indent_two
+<                         mock_indent_three
+
+- It should replace partial tabs with partial spaces.
+$ detab
+> mock text with zero indent
+> 	text with one indent
+> 	aaa	text with two indents
+> 		more text with two indents
+< mock text with zero indent
+<         text with one indent
+<         aaa     text with two indents
+<                 more text with two indents
