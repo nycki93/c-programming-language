@@ -28,89 +28,119 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <windows.h>
+
+#define LINE_MAX 256
+#define NAME_MAX 256
+
 /**
- * Gets a line from stdin if possible. Returns the length of the line,
- * including the newline char, or 0 if no line was found. 
+ * Gets from stdin until newline or EOF is encountered. Fills the buffer 
+ * with as much of the line as possible. Returns the length of the line. 
+ * If the return value is greater than buffer_len - 1, then the line was
+ * truncated.
  */
-int get_line(char **out_line) {
-	size_t i = 0;
-	size_t buf_size = 4;
-	char *buffer = malloc(buf_size);
+int get_line(int buffer_len, char *buffer) {
+	if (buffer_len <= 0) return 0;
+
+	int i = 0;
 	int c = getchar();
 	if (c == EOF) return 0;
-
-	while (1) {
-		if (c == EOF) c = '\n';
-		buffer[i++] = c;
-		if (i >= buf_size) {
-			buf_size *= 2;
-			buffer = realloc(buffer, buf_size);
-		}
-		if (c == '\n') break;
+	buffer[i] = c;
+	i++;
+	
+	while (c != '\n' && i + 1 < buffer_len) {
 		c = getchar();
+		if (c == EOF) c = '\n';
+		buffer[i] = c;
+		i++;
 	}
-	buffer = realloc(buffer, i+1);
 	buffer[i] = '\0';
 
-	*out_line = buffer;
+	while (c != '\n') {
+		c = getchar();
+		if (c == EOF) c = '\n';
+		i++;
+	}
 	return i;
 }
 
 /**
- * Extract the name of a test and save as a new string. Do not include
+ * Copy the name of a test into the specified buffer. Do not include
  * the leading dash and space or the ending newline. For example:
  * - my test name\n
  * becomes:
  * my test name
  */
-int get_name(char **out_name, int line_len, char *line) {
+int get_name(int buffer_len, char *buffer, int line_len, char *line) {
+	if (buffer_len <= 0) return 0;
+
 	int offset = 1;
 	while (line[offset] == ' ') offset++;
 
-	int name_len = line_len - offset;
-	char *name = malloc(name_len + 1);
 	int i = 0;
 	int c = line[i + offset];
-	while (i < name_len && c != '\0' && c != '\n') {
-		name[i++] = c;
+	while (
+		c != '\0' && c != '\n' 
+		&& i + offset < line_len 
+		&& i + 1 < buffer_len
+	) {
+		buffer[i] = c;
+		i++;
 		c = line[i + offset];
 	}
-	name = realloc(name, i+1);
-	name[i] = '\0';
+	buffer[i] = '\0';
 
-	*out_name = name;
+	while (
+		c != '\0' && c != '\n'
+		&& i + offset < line_len
+	) {
+		i++;
+		c = line[i + offset];
+	}
 	return i;
 }
 
+void warn_truncated(int line_num, int line_len) {
+	printf(
+		"WARNING: Truncated line %d from length %d to %d.\n",
+		line_num, line_len, LINE_MAX - 1
+	);
+}
+
+void err_bad_command(int line_num, char c) {
+	printf("ERROR: Unknown command %c on line %d.\n", c, line_num);
+}
+
 int main() {
-	int line_num = 0;
 	int line_len = 0;
-	char *line = NULL;
+	char line[LINE_MAX];
 	int name_len = 0;
-	char *name = NULL;
-	while(line_len = get_line(&line)) {
+	char name[NAME_MAX];
+	int line_num = 0;
+	while(line_len = get_line(LINE_MAX, line)) {
 		line_num++;
-		if (line[0] == '#' || line[0] == '\n') {
-			/* do nothing with comments and blank lines */
-		} else if (line[0] == '-') {
-			if (name) free(name);
-			name_len = get_name(&name, line_len, line);
-			printf("Test: %s\n", name);
-		} else {
-			/* TODO warn about invalid line */
-			printf(
-				"Unexpected command '%c' on line %d.\n", 
-				line[0], line_num
-			);
+		if (line_len > LINE_MAX - 1) {
+			warn_truncated(line_num, line_len);
 		}
+		switch (line[0]) {
+			case '#':
+			case '\n':
+			/* do nothing with comments and blank lines */
+			break;
+		
+			case '-':
+			name_len = get_name(NAME_MAX, name, LINE_MAX, line);
+			printf("Test: %s\n", name);
+			break;
 
-		/* TODO $ invoke command */
+			/* TODO $ invoke command */
 
-		/* TODO > send stdin */
+			/* TODO > send stdin */
 
-		/* TODO < assert stdout */
+			/* TODO < assert stdout */
 
-		free(line);
+			default:
+			err_bad_command(line_num, line[0]);
+		}
 	}
-	if (name) free(name);
 }
