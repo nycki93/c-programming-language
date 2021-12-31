@@ -42,8 +42,12 @@ int main(int num_args, char** args)
     HANDLE parent_stdout = GetStdHandle(STD_OUTPUT_HANDLE);
     printf("Child process's output:\n");
     while (1) {
+        printf("About to read from child pipe.\n");
         t = ReadFile(child_stdout_read, buffer, 1024, &num_read, NULL);
-        if (!t || num_read == 0) break;
+        if (!t || num_read == 0) {
+            printf("Failed to read from child pipe.\n");
+            break;
+        }
 
         t = WriteFile(parent_stdout, buffer, num_read, &num_written, NULL);
         if (!t) break;
