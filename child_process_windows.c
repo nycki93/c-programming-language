@@ -36,7 +36,7 @@ BOOL spawn(char* cmd, MY_COROUTINE* out_cr) {
     si.hStdOutput = out_write;
     si.hStdInput = in_read;
     si.dwFlags = STARTF_USESTDHANDLES;
-    t = CreateProcess(0, cmd, 0, 0, 1, 0, 0, 0, &si, &pi);
+    t = CreateProcess(NULL, cmd, NULL, NULL, 1, 0, NULL, NULL, &si, &pi);
     // Failed to start process?
     if (!t) return FALSE; 
 
