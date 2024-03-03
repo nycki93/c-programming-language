@@ -27,10 +27,10 @@ int main() {
 int my_getline(char s[], int lim) 
 {
     int c, i;
-    for (i = 0; i < lim; ++i) {
+    for (i = 0; i < lim-1; ++i) {
         c = getchar();
-        s[i] = c;
         if (c == EOF) break;
+        s[i] = c;
         if (c == '\n') break;
     }
     s[i] == '\0';

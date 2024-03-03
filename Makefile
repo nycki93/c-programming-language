@@ -7,5 +7,11 @@ hello: hello.c
 2-2-getline: 2-2-getline.c
 	gcc 2-2-getline.c -o 2-2-getline
 
+2-3-hex-to-int: 2-3-hex-to-int.c
+	gcc 2-3-hex-to-int.c -o 2-3-hex-to-int
+
 clean:
-	rm -f hello 2-2-getline
+	rm -f \
+		hello \
+		2-2-getline \
+		2-3-hex-to-int
