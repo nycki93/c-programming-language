@@ -2,6 +2,7 @@
 *
 !/**/
 !*.*
+!Makefile
 
 # Ignore other compiled files
 *.exe
