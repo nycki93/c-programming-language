@@ -40,10 +40,22 @@ int hex_value(char c) {
     if ('A' <= c && c <= 'F') {
         return c - 'A' + 10;
     }
-    return -1;
+    return 0;
 }
 
 int htoi(char s[]) {
-    return hex_value(s[0]);
-    // TODO: finish this
+    int index = 0;
+    int result = 0;
+    if (s[0] == '0') {
+        if (s[1] == 'x' || s[1] == 'X') {
+            index = 2;
+        } else {
+            return 0;
+        }
+    }
+    char c;
+    for (c = s[index]; c != '\0'; c = s[++index] ) {
+        result = result * 16 + hex_value(c);
+    }
+    return result;
 }
